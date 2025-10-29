@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Chunithm</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    input { padding: 5px; margin-bottom: 10px; width: 200px; }
+    table { border-collapse: collapse; width: 100%; max-width: 600px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    tr.hide { display: none; }
+  </style>
+</head>
+<body>
+  <h2>Chunithm</h2>
+
+  <input type="text" id="searchBox" placeholder="検索...（例：太郎、日本）">
+
+  <table id="sheetTable" border="1"></table>
+
+  <script>
+    const url = "https://opensheet.elk.sh/1Z-s2QMTFPUjsC7jmrATpDrqRJpAkH6iyFjur3Dzm1iw/Sheet1";
+    const table = document.getElementById("sheetTable");
+
+    // スプレッドシートからデータ取得
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        const headers = Object.keys(data[0]);
+
+        // ヘッダー作成
+        const headerRow = document.createElement("tr");
+        headers.forEach(h => {
+          const th = document.createElement("th");
+          th.textContent = h;
+          headerRow.appendChild(th);
+        });
+        table.appendChild(headerRow);
+
+        // 各行作成
+        data.forEach(row => {
+          const tr = document.createElement("tr");
+          headers.forEach(h => {
+            const td = document.createElement("td");
+            td.textContent = row[h];
+            tr.appendChild(td);
+          });
+          table.appendChild(tr);
+        });
+
+        // 🔍 検索機能
+        const searchBox = document.getElementById("searchBox");
+        searchBox.addEventListener("input", () => {
+          const keyword = searchBox.value.toLowerCase();
+          const rows = table.querySelectorAll("tr:not(:first-child)");
+
+          rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.classList.toggle("hide", !text.includes(keyword));
+          });
+        });
+      })
+      .catch(err => console.error("データ取得エラー:", err));
+  </script>
+</body>
+</html>
+
