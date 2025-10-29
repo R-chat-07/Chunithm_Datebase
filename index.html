@@ -43,7 +43,7 @@
         headers.forEach(h => {
           const th = document.createElement("th");
           const input = document.createElement("input");
-          input.placeholder = h + "で検索";
+          input.placeholder = "絞り込み";
           input.dataset.key = h;
           th.appendChild(input);
           searchRow.appendChild(th);
