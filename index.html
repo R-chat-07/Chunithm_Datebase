@@ -2,39 +2,94 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>Chunithm</title>
+  <title>Chunithm Datebase</title>
   <style>
     body { font-family: sans-serif; margin: 20px; }
-    input { padding: 5px; margin-bottom: 10px; width: 200px; }
     table { border-collapse: collapse; width: 100%; max-width: 600px; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
     th { background-color: #f2f2f2; }
+    input {
+      width: 95%;
+      padding: 3px;
+      box-sizing: border-box;
+    }
     tr.hide { display: none; }
   </style>
 </head>
 <body>
   <h2>Chunithm</h2>
-
-  <input type="text" id="searchBox" placeholder="検索...（例：太郎、日本）">
-
   <table id="sheetTable" border="1"></table>
 
   <script>
+    // あなたのスプレッドシートURLに置き換えてください
     const url = "https://opensheet.elk.sh/1Z-s2QMTFPUjsC7jmrATpDrqRJpAkH6iyFjur3Dzm1iw/Sheet1";
-    const table = document.getElementById("sheetTable");
 
-    // スプレッドシートからデータ取得
     fetch(url)
       .then(res => res.json())
       .then(data => {
         const headers = Object.keys(data[0]);
+        const table = document.getElementById("sheetTable");
 
-        // ヘッダー作成
+        // --- ヘッダー行 ---
         const headerRow = document.createElement("tr");
         headers.forEach(h => {
           const th = document.createElement("th");
           th.textContent = h;
           headerRow.appendChild(th);
+        });
+        table.appendChild(headerRow);
+
+        // --- 検索入力行 ---
+        const searchRow = document.createElement("tr");
+        headers.forEach(h => {
+          const th = document.createElement("th");
+          const input = document.createElement("input");
+          input.placeholder = h + "で検索";
+          input.dataset.key = h;
+          th.appendChild(input);
+          searchRow.appendChild(th);
+        });
+        table.appendChild(searchRow);
+
+        // --- データ行 ---
+        data.forEach(row => {
+          const tr = document.createElement("tr");
+          headers.forEach(h => {
+            const td = document.createElement("td");
+            td.textContent = row[h];
+            tr.appendChild(td);
+          });
+          table.appendChild(tr);
+        });
+
+        // --- 検索イベント ---
+        const inputs = table.querySelectorAll("input");
+        inputs.forEach(input => {
+          input.addEventListener("input", () => {
+            const filters = {};
+            inputs.forEach(i => {
+              if (i.value) filters[i.dataset.key] = i.value.toLowerCase();
+            });
+
+            const rows = table.querySelectorAll("tr:not(:nth-child(-n+2))"); // データ行のみ
+            rows.forEach(row => {
+              const cells = row.querySelectorAll("td");
+              const rowData = {};
+              headers.forEach((h, i) => rowData[h] = cells[i].textContent.toLowerCase());
+
+              // すべての条件に一致すれば表示
+              const match = Object.keys(filters).every(key => 
+                rowData[key].includes(filters[key])
+              );
+              row.classList.toggle("hide", !match);
+            });
+          });
+        });
+      })
+      .catch(err => console.error("データ取得エラー:", err));
+  </script>
+</body>
+</html>          headerRow.appendChild(th);
         });
         table.appendChild(headerRow);
 
