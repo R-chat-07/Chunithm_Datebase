@@ -88,35 +88,4 @@
       .catch(err => console.error("データ取得エラー:", err));
   </script>
 </body>
-</html>          headerRow.appendChild(th);
-        });
-        table.appendChild(headerRow);
-
-        // 各行作成
-        data.forEach(row => {
-          const tr = document.createElement("tr");
-          headers.forEach(h => {
-            const td = document.createElement("td");
-            td.textContent = row[h];
-            tr.appendChild(td);
-          });
-          table.appendChild(tr);
-        });
-
-        // 🔍 検索機能
-        const searchBox = document.getElementById("searchBox");
-        searchBox.addEventListener("input", () => {
-          const keyword = searchBox.value.toLowerCase();
-          const rows = table.querySelectorAll("tr:not(:first-child)");
-
-          rows.forEach(row => {
-            const text = row.innerText.toLowerCase();
-            row.classList.toggle("hide", !text.includes(keyword));
-          });
-        });
-      })
-      .catch(err => console.error("データ取得エラー:", err));
-  </script>
-</body>
 </html>
-
